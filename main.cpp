@@ -28,12 +28,92 @@ public:
 		srv_backlog = BACKLOG;
 	}
 
+	void build_str(const std::string& initial, std::string& response)
+	{
+		std::string tmp("");
+		std::stringstream ss_in(initial);
+		std::stringstream ss_out;
+		std::vector<float> nums_to_sort;	//No idea how many numbers, may need to access elements in middle, vector is best choice
+
+		//Initialized response stringstream
+		ss_out << "SORTED ";
+
+		//Initial input
+		ss_in >> tmp;
+
+		//Invalid request format
+		if (tmp != "LIST")
+		{
+			response = "ERROR";
+			return;
+		}
+
+		//Number of inputs in LIST request
+		int count = 0;
+
+		int valid = 0;
+		while (!ss_in.eof())
+		{
+			//Read next value
+			ss_in >> tmp;
+			count++;
+
+			float val = 0;
+
+			std::cout << "String: " << tmp << "\n";
+
+			//First check if float, then int, else error
+			if (sscanf(tmp.c_str(), "%f", &val) > 0)
+			{
+				ss_out << val << " ";
+				std::cout << "float: " << val << "\n";
+				continue;
+			}
+
+			response = "ERROR";
+			return;
+		}
+
+		if (count <= 0)
+		{
+			response = "ERROR";
+			return;
+		}
+
+		response = ss_out.str();
+	}
+
 	/// <summary>
 	/// Handles any connected clients
 	/// </summary>
 	/// <returns>Whether or not the connection is alive</returns>
-	bool handle_connection()
+	bool handle_connection(Socket& clt_sock)
 	{
+		char buffer[4096];
+		int nbytes_recvd = clt_sock.Recv(buffer, sizeof(buffer));
+
+		if (nbytes_recvd == -1)
+		{
+			//Error and crash
+			perror("recv() failed");
+			exit(1);
+		}
+
+		//Got no data
+		if (nbytes_recvd == 0) { return false; }
+
+		//Receive initial message
+		std::string msg_recvd(buffer, nbytes_recvd);
+		std::cout << "Received message " << nbytes_recvd << " bytes long: '" << msg_recvd << "'\n";
+
+		//Construct response
+		std::string response("");
+		build_str(msg_recvd, response);
+
+		//Send response
+		std::cout << "Sending message " << response.size() << " bytes long: '" << response << "'\n\n";
+		clt_sock.Send(response.data(), response.size());
+ 
 		return true;
 	}
 
@@ -62,7 +142,7 @@ public:
 			std::cout << "Connection received.\n";
 			std::cout << "----------------------\n\n";
 
-			while (handle_connection())
+			while (handle_connection(clt_sock))
 			{
 
 			}
