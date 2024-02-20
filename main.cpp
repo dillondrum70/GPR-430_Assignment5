@@ -60,12 +60,12 @@ public:
 
 			float val = 0;
 
-			std::cout << "String: " << tmp << "\n";
+			std::cout << "String Input: " << tmp << "\n";
 
 			//First check if float, then int, else error
 			if (sscanf(tmp.c_str(), "%f", &val) > 0)
 			{
-				ss_out << val << " ";
+				nums_to_sort.push_back(val);
 				std::cout << "float: " << val << "\n";
 				continue;
 			}
@@ -74,10 +74,26 @@ public:
 			return;
 		}
 
+		//No numbers passed
 		if (count <= 0)
 		{
 			response = "ERROR";
 			return;
+		}
+
+		//Sort
+		std::sort(nums_to_sort.begin(), nums_to_sort.end());
+
+		//Add sorted numbers to stringstream
+		for (int i = 0; i < nums_to_sort.size(); i++)
+		{
+			ss_out << nums_to_sort[i];
+
+			//Don't need space after last element
+			if (i < nums_to_sort.size() - 1)
+			{
+				ss_out << " ";
+			}
 		}
 
 		response = ss_out.str();
