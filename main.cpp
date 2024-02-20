@@ -31,6 +31,7 @@ public:
 	void build_str(const std::string& initial, std::string& response)
 	{
 		std::string tmp("");
+		char sortType = ' ';
 		std::stringstream ss_in(initial);
 		std::stringstream ss_out;
 		std::vector<float> nums_to_sort;	//No idea how many numbers, may need to access elements in middle, vector is best choice
@@ -52,6 +53,7 @@ public:
 		int count = 0;
 
 		int valid = 0;
+		int sortIndex = 0;
 		while (!ss_in.eof())
 		{
 			//Read next value
@@ -61,6 +63,22 @@ public:
 			float val = 0;
 
 			std::cout << "String Input: " << tmp << "\n";
+
+			//Check for sorting type
+			sortIndex = tmp.find_first_of("|");
+			if (sortIndex >= 0)
+			{
+				//Make sure index exists
+				if (sortIndex + 1 >= tmp.size())
+				{
+					response = "ERROR";
+					return;
+				}
+				else
+				{
+					sortType = tmp[sortIndex + 1];
+				}
+			}
 
 			//First check if float, then int, else error
 			if (sscanf(tmp.c_str(), "%f", &val) > 0)
@@ -81,8 +99,27 @@ public:
 			return;
 		}
 
-		//Sort
-		std::sort(nums_to_sort.begin(), nums_to_sort.end());
+		switch (sortType)
+		{
+		case 'd':	//Descedning
+			std::sort(nums_to_sort.begin(), nums_to_sort.end(), [](int a, int b) {return a > b; });
+			break;
+
+		case 's':	//Alphabetical
+			std::sort(nums_to_sort.begin(), nums_to_sort.end(), [](char a, char b) {return a < b; });
+			break;
+		
+		case 'a':	//Ascending
+		case ' ':
+			std::sort(nums_to_sort.begin(), nums_to_sort.end());
+			break;
+
+		default:	//Invalid
+			response = "ERROR";
+			return;
+			
+		}
+		
 
 		//Add sorted numbers to stringstream
 		for (int i = 0; i < nums_to_sort.size(); i++)
