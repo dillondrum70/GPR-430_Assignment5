@@ -106,7 +106,7 @@ public:
 			break;
 
 		case 's':	//Alphabetical
-			std::sort(nums_to_sort.begin(), nums_to_sort.end(), [](char a, char b) {return a < b; });
+			std::sort(nums_to_sort.begin(), nums_to_sort.end(), [](int a, int b) {return std::to_string(a) < std::to_string(b); });
 			break;
 		
 		case 'a':	//Ascending
