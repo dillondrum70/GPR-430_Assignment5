@@ -162,6 +162,20 @@ else:
           + f"received {response_string.decode('ascii')})")
     all_passed = False
 
+# Test 10: Suffix sent in middle of message
+test_string = "LIST 1 2 3 |a 10 20 100"
+success_string = "ERROR"
+sock.sendall(test_string.encode("ascii"))
+response_string = sock.recv(4096)
+
+# Report test success/failure
+if response_string.decode("ascii") == success_string:
+    print("TEST #10: PASS")
+else:
+    print(f"TEST #10: FAIL (expected {success_string}, " \
+          + f"received {response_string.decode('ascii')})")
+    all_passed = False
+
 sock.close()
 
 sys.exit(0 if all_passed else 1)
